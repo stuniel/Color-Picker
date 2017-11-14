@@ -6,6 +6,10 @@
           box-sizing: border-box;
 }
 
+body {
+  background-color: #000;
+}
+
 .color-picker-container {
   position: absolute;
   width: 100%;
@@ -20,27 +24,27 @@
 .header-container, .main-container, .footer-container{
   position: relative;
   width: 100%;
-  border: solid 2px pink;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  align-content: stretch;
 }
 
 .header-container {
   height: 12.5%;
+  border-radius: 20px 20px 0 0;
 }
 
 .main-container {
   height: 75%;
+  background-color: #fff;
 }
 
 .footer-container {
   height: 12.5%;
+  border-radius: 0 0 20px 20px;
 }
 
 .hue-panel, .hex-panel, .rgba-panel {
+  position: relative;
+  width: 100%;
+  height: calc(100% / 6);
   display: -webkit-flex;
   display:         flex;
   -webkit-align-items: center;
@@ -50,17 +54,12 @@
 }
 
 .hue-panel {
-  position: relative;
-  border: solid 2px blue;
-  width: 100%;
   align-items: center;
-  height: calc(100% / 6);
 }
 
 .color-panel {
   display: -webkit-flex;
   display:         flex;
-  border: solid 2px blue;
   width: 100%;
   height: calc(100% / 2);
   float: left;
@@ -71,17 +70,11 @@
 }
 
 .hex-panel {
-  width: 100%;
-  height: calc(100% / 6);
-  border: solid 2px blue;
   align-items: flex-start;
   justify-content: center;
 }
 
 .rgba-panel {
-  width: 100%;
-  height: calc(100% / 6);
-  border: solid 2px blue;
   display: flex;
   flex-direction: row;
   align-items: flex-start;
@@ -90,39 +83,38 @@
 
 
 .hue-wrapper, .color-wrapper, .alpha-wrapper, .hex-wrapper {
-
+  position: relative;
 }
 
 .hue-wrapper {
   width: calc(100% * (8/10));
   height: calc(100% / 3);
-  border: solid 2px red;
+  border-radius: 20px;
+  z-index: 2;
 }
 
 .color-wrapper {
   width: calc(100% * (7/12));
   height: calc(100% * (8/9));
-  border: solid 2px red;
+  border-radius: 24px;
   margin-left: 10%;
+  z-index: 2;
 }
 
 .alpha-wrapper {
   width: calc(100% * (1/12));
   height: calc(100% * (8/9));
-  border: solid 2px red;
   margin-right: 10%;
 }
 
 .hex-wrapper {
   width: calc(100% * (8/10));
   height: calc(100% * (2/3));
-  border: solid 2px red;
 }
 
 .r-wrapper, .g-wrapper, .b-wrapper, .a-wrapper {
   width: calc(100% * (1.5/10));
   height: calc(100% * (2/3));
-  border: solid 2px red;
 }
 
 .r-wrapper {
@@ -134,50 +126,79 @@
 }
 
 .hue-canvas {
-  height: 20px;
-}
-
-.hue-picker, .color-picker, .alpha-picker {
-  position: absolute;
-  z-index: 10;
-  width: 16px;
-  height: 16px;
-  border: 2px solid white;
+  box-sizing: padding-box;
+  display: block;
+  position: relative;
+  z-index: 1;
+  top: 0;
+  left: 0;
   border-radius: 20px;
 }
 
-.color-canvas {
+.picker {
+  position: absolute;
+  z-index: 10;
+  width: 24px;
+  height: 24px;
+  border: 3px solid #000;
+  border-radius: 20px;
+}
 
+.hue-picker {
+  left: 0;
+  top: calc(50% - 12px);
+}
+
+.color-canvas {
+  box-sizing: padding-box;
+  display: block;
+  position: relative;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  border-radius: 20px;
 }
 
 .color-picker {
-
+  top: 0;
+  right: 0;
 }
 
 .alpha-canvas {
-  width: 20px;
+  box-sizing: padding-box;
+  display: block;
+  border-radius: 20px;
 }
 
 .alpha-picker {
+  bottom: 0;
+  left: calc(50% - 12px);
+}
 
+input {
+  height: 100%;
+  width: 100%;
+  border: solid 0 #000;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 14pt;
+  background: #ddd;
 }
 
 .hex-input {
-  height: 40px;
 }
 
-.r-input {
-  height: 40px;
+.r-input::after {
+  content: "R";
+  font-size: 20pt;
+  z-index: 20;
 }
 
 .g-input {
-  height: 40px;
 }
 
 .b-input {
-  height: 40px;
 }
 
 .a-input {
-  height: 40px;
 }

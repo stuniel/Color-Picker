@@ -3,40 +3,59 @@ var pickerFlag = false;
 var huePickerFlag = false;
 
 var panel = {
-  elm: Object.create(null),
+  elm: {
+    hue: Object.create(null),
+    color: Object.create(null),
+    alpha: Object.create(null)
+  },
   mouse: Object.create(null),
+  elements: Object.create(null),
   width:300,
   height:300,
-  hue:[255,255,0],
+  hue:[255,0,0],
   mouseY: 0,
   mouseX: 0
 };
 
-panel.r = 222;
-panel.g = 104;
-panel.b = 78;
+panel.r = 250;
+panel.g = 0;
+panel.b = 0;
 panel.a = 0;
 
 // UZYSKANIE WSPOLRZEDNYCH I HUE Z WPISANYCH RGB
 
 function buildApp() {
-  var headerContainer = createElm("div", wrapper, "header-container");
-  var mainContainer = createElm("div", wrapper, "main-container");
-  var footerContainer = createElm("div", wrapper, "footer-container");
+  var elm = panel.elements;
 
-  var huePanel = createElm("div", mainContainer, "hue-panel");
-  var colorPanel = createElm("div", mainContainer, "color-panel");
-  var hexPanel = createElm("div", mainContainer, "hex-panel");
-  var rgbaPanel = createElm("div", mainContainer, "rgba-panel");
+  elm.headerContainer = createElm("div", wrapper, "header-container");
+  elm.mainContainer = createElm("div", wrapper, "main-container");
+  elm.footerContainer = createElm("div", wrapper, "footer-container");
 
-  var hueWrapper = createElm("div", huePanel, "hue-wrapper");
-  var colorWrapper = createElm("div", colorPanel, "color-wrapper");
-  var alphaWrapper = createElm("div", colorPanel, "alpha-wrapper");
-  var hexWrapper = createElm("div", hexPanel, "hex-wrapper");
-  var rWrapper = createElm("div", rgbaPanel, "r-wrapper");
-  var gWrapper = createElm("div", rgbaPanel, "g-wrapper");
-  var bWrapper = createElm("div", rgbaPanel, "b-wrapper");
-  var aWrapper = createElm("div", rgbaPanel, "a-wrapper");
+  elm.huePanel = createElm("div", elm.mainContainer, "hue-panel");
+  elm.colorPanel = createElm("div", elm.mainContainer, "color-panel");
+  elm.hexPanel = createElm("div", elm.mainContainer, "hex-panel");
+  elm.rgbaPanel = createElm("div", elm.mainContainer, "rgba-panel");
+
+  elm.hueWrapper = createElm("div", elm.huePanel, "hue-wrapper");
+  elm.colorWrapper = createElm("div", elm.colorPanel, "color-wrapper");
+  elm.alphaWrapper = createElm("div", elm.colorPanel, "alpha-wrapper");
+  elm.hexWrapper = createElm("div", elm.hexPanel, "hex-wrapper");
+  elm.rWrapper = createElm("div", elm.rgbaPanel, "r-wrapper");
+  elm.gWrapper = createElm("div", elm.rgbaPanel, "g-wrapper");
+  elm.bWrapper = createElm("div", elm.rgbaPanel, "b-wrapper");
+  elm.aWrapper = createElm("div", elm.rgbaPanel, "a-wrapper");
+
+  elm.hueCanvas = createHueCanvas();
+  elm.huePicker = createElm("div", elm.hueWrapper, "hue-picker picker");
+  elm.colorCanvas = createColorCanvas();
+  elm.colorPicker = createElm("div", elm.colorWrapper, "color-picker picker");
+  elm.alphaCanvas = createAlphaCanvas();
+  elm.alphaPicker = createElm("div", elm.alphaWrapper, "alpha-picker picker");
+  elm.hexInput = createElm("input", elm.hexWrapper, "hex-input");
+  elm.rInput = createElm("input", elm.rWrapper, "r-input");
+  elm.gInput = createElm("input", elm.gWrapper, "g-input");
+  elm.bInput = createElm("input", elm.bWrapper, "b-input");
+  elm.aInput = createElm("input", elm.aWrapper, "a-input");
 }
 buildApp()
 
@@ -94,23 +113,82 @@ function createElm(elem, parent, className) {
   return elm
 }
 
-function createColorCanvas() {
-  var colorCanvas = createElm("canvas", colorWrapper, "color-canvas");
-  colorCanvas.width = colorWrapper.width;
-  colorCanvas.height = colorWrapper.height;
-  drawColorCanvas(colorCanvas, colorCanvas, panel);
+function createHueCanvas() {
+  panel.elm.hue.x = 0;
+  panel.elm.hue.y = 0;
+  panel.elm.hue.width = panel.elements.hueWrapper.getBoundingClientRect().width;
+  panel.elm.hue.height = panel.elements.hueWrapper.getBoundingClientRect().height;
+  var hueCanvas = createElm("canvas", panel.elements.hueWrapper, "hue-canvas");
+  hueCanvas.width = panel.elm.hue.width;
+  hueCanvas.height = panel.elm.hue.height;
+  drawHueCanvas(panel.elm.hue, hueCanvas, panel);
+  window.addEventListener("resize", function() {
+    panel.elm.hue.width = panel.elements.hueWrapper.getBoundingClientRect().width;
+    panel.elm.hue.height = panel.elements.hueWrapper.getBoundingClientRect().height;
+    hueCanvas.width = panel.elm.hue.width;
+    hueCanvas.height = panel.elm.hue.height;
+    drawHueCanvas(panel.elm.hue, hueCanvas, panel);
+  })
+  return hueCanvas;
 }
 
+function createColorCanvas() {
+  var colorCanvas = createElm("canvas", panel.elements.colorWrapper, "color-canvas");
+  colorCanvas.width = panel.elements.colorWrapper.clientWidth;
+  colorCanvas.height = panel.elements.colorWrapper.clientHeight;
+  drawColorCanvas(colorCanvas, colorCanvas, panel);
+  window.addEventListener("resize", function() {
+    colorCanvas.width = panel.elements.colorWrapper.clientWidth;
+    colorCanvas.height = panel.elements.colorWrapper.clientHeight;
+    drawColorCanvas(colorCanvas, colorCanvas, panel)
+  }, true);
+  panel.elm.color.x = panel.elements.colorWrapper.clientWidth;
+  panel.elm.color.y = 0;
+  return colorCanvas;
+}
 
-function getElm(elm) {
-  panel.elm.elm = elm;
-  panel.elm.rect = elm.getBoundingClientRect();
-  panel.elm.picker = elm.querySelector(".picker");
-  panel.elm.x = panel.mouse.x - panel.elm.rect.left + panel.elm.elm.scrollLeft;
-  panel.elm.y = panel.mouse.y - panel.elm.rect.top + panel.elm.elm.scrollTop;
-  panel.elm.xPer = panel.elm.x / panel.elm.rect.width;
-  panel.elm.yPer = panel.elm.y / panel.elm.rect.height;
+function createAlphaCanvas() {
+  var alphaCanvas = createElm("canvas", panel.elements.alphaWrapper, "alpha-canvas");
+  alphaCanvas.width = panel.elements.alphaWrapper.clientWidth;
+  alphaCanvas.height = panel.elements.alphaWrapper.clientHeight;
+  drawAlphaCanvas(alphaCanvas, alphaCanvas, panel);
+  window.addEventListener("resize", function() {
+    alphaCanvas.width = panel.elements.alphaWrapper.clientWidth;
+    alphaCanvas.height = panel.elements.alphaWrapper.clientHeight;
+    drawAlphaCanvas(alphaCanvas, alphaCanvas, panel)
+  }, true);
+  panel.elm.alpha.x = panel.elements.alphaWrapper.clientWidth;
+  panel.elm.alpha.y = 0;
+  return alphaCanvas;
+}
+
+function getElm(elm, type) {
+  var a = panel.elm[type];
+  a.elm = elm;
+  a.rect = elm.getBoundingClientRect();
+  a.picker = elm.querySelector(".picker");
+  a.x = panel.mouse.x - a.rect.left + a.elm.scrollLeft;
+  a.y = panel.mouse.y - a.rect.top + a.elm.scrollTop;
+  a.width = a.rect.width;
+  a.height = a.rect.height;
+  a.xPer = a.x / a.width;
+  a.yPer = a.y / a.height;
   console.log(panel.elm);
+}
+
+function updatePanelHue(parent) {
+  panel.hue[0] = Math.floor(hueGradient(parent, panel, panel.elm.hue.x, panel.elm.hue.y, 0));
+  panel.hue[1] = Math.floor(hueGradient(parent, panel, panel.elm.hue.x, panel.elm.hue.y, 2));
+  panel.hue[2] = Math.floor(hueGradient(parent, panel, panel.elm.hue.x, panel.elm.hue.y, 4));
+  console.log(panel.hue)
+  console.log(panel.r, panel.g, panel.b)
+}
+
+function updatePanelColor(parent) {
+  panel.r = colorGradient(panel.hue[0], parent, panel.elm.color.x, panel.elm.color.y);
+  panel.g = colorGradient(panel.hue[1], parent, panel.elm.color.x, panel.elm.color.y);
+  panel.b = colorGradient(panel.hue[2], parent, panel.elm.color.x, panel.elm.color.y);
+  console.log(panel.r, panel.g, panel.b, "hello")
 }
 
 function getMouse(e) {
@@ -119,29 +197,30 @@ function getMouse(e) {
   console.log(panel.mouse);
 }
 
-function updatePicker() {
-  panel.elm.picker.style.top = panel.elm.y;
-  panel.elm.picker.style.left = panel.elm.x;
+function updatePicker(type) {
+  panel.elm[type].picker.style.top = panel.elm[type].y;
+  panel.elm[type].picker.style.left = panel.elm[type].x;
 }
 
 // MOUSEDOWN HUE WRAPPER
 
 function drawHueCanvas(parent, elm, panel) {
-  var ctx = colorCanvas.getContext("2d");
+  var ctx = elm.getContext("2d");
   var imgdata = ctx.getImageData(0, 0, parent.width, parent.height);
   var imgdatalength = imgdata.data.length;
   for (var i = 0; i < imgdatalength / 4; i++) {
     var x = i % parent.width;
     var y = Math.floor(i / parent.width);
-    imgdata.data[4*i] = hueGradient(panel, panel.r, x, y, 0);
-    imgdata.data[4*i+1] = hueGradient(panel, panel.g, x, y, 2);
-    imgdata.data[4*i+2] = hueGradient(panel, panel.b, x, y, 4);
+    imgdata.data[4*i] = hueGradient(parent, panel, x, y, 0);
+    imgdata.data[4*i+1] = hueGradient(parent, panel, x, y, 2);
+    imgdata.data[4*i+2] = hueGradient(parent, panel, x, y, 4);
     imgdata.data[4*i+3] = 255;
   }
   ctx.putImageData(imgdata, 0, 0);
 }
 
-function hueGradient(panel, color, x, y, hue) {
+function hueGradient(parent, panel, x, y, hue) {
+  var colorValue;
   var segment = (parent.width/6)
   var range = (x/parent.width)*6;
   var z = (x/segment);
@@ -168,7 +247,7 @@ function hueGradient(panel, color, x, y, hue) {
 // MOUSEDOWN COLOR WRAPPER
 
 function drawColorCanvas(parent, elm, panel) {
-  var ctx = colorCanvas.getContext("2d");
+  var ctx = elm.getContext("2d");
   var imgdata = ctx.getImageData(0, 0, parent.width, parent.height);
   var imgdatalength = imgdata.data.length;
   for(var i=0; i<imgdatalength/4; i++) {
@@ -180,6 +259,8 @@ function drawColorCanvas(parent, elm, panel) {
     imgdata.data[4*i+3] = 255;
   }
   ctx.putImageData(imgdata, 0, 0);
+  panel.elements.headerContainer.style.background = `rgb(${panel.r}, ${panel.g}, ${panel.b})`
+  panel.elements.footerContainer.style.background = `rgb(${panel.r}, ${panel.g}, ${panel.b})`
 }
 
 function colorGradient(color, parent, x, y) {
@@ -188,13 +269,31 @@ function colorGradient(color, parent, x, y) {
 
 //MOUSEDOWN APLHA WRAPPER
 
+function drawAlphaCanvas(parent, elm, panel) {
+  var ctx = elm.getContext("2d");
+  var imgdata = ctx.getImageData(0, 0, parent.width, parent.height);
+  var imgdatalength = imgdata.data.length;
+  for (var i = 0; i < imgdatalength / 4; i++) {
+    var x = i % parent.width;
+    var y = Math.floor(i / parent.width);
+    imgdata.data[4*i] = panel.r
+    imgdata.data[4*i+1] = panel.g
+    imgdata.data[4*i+2] = panel.b
+    imgdata.data[4*i+3] = y/parent.height * 255;
+  }
+  ctx.putImageData(imgdata, 0, 0);
+}
 
-wrapper.addEventListener("mousedown", function(e) {
+panel.elements.hueWrapper.addEventListener("mousedown", function(e) {
   getMouse(e);
-  getElm(this);
-  updatePicker();
-  var colorCanvas = this.querySelector("canvas");
-  drawColorCanvas(this, colorCanvas, panel);
+  getElm(this, "hue");
+  updatePanelHue(panel.elements.hueCanvas);
+  updatePanelColor(panel.elements.colorCanvas);
+  updatePicker("hue");
+  drawColorCanvas(panel.elements.colorCanvas, panel.elements.colorCanvas, panel);
+  drawAlphaCanvas(panel.elements.alphaCanvas, panel.elements.alphaCanvas, panel);
+  console.log(this)
+
 })
 
 
