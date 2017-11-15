@@ -7,18 +7,26 @@
 }
 
 body {
-  background-color: #000;
+  background-color: #666;
+  font-family: 'Lato', sans-serif;
 }
 
 .color-picker-container {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+  position: relative;
+  width: 400px;
+  height: 650px;
   display: flex;
   flex-direction: column;
   align-items: center;
   align-content: stretch;
   justify-content: center;
+  background-color: #fff;
+  border-radius: 20px;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+  transform: translate(-50%, -50%);
 }
 
 .header-container, .main-container, .footer-container{
@@ -145,8 +153,9 @@ body {
 }
 
 .hue-picker {
-  left: 0;
+  left: -12px;
   top: calc(50% - 12px);
+  background-color: rgb(255, 0, 0);
 }
 
 .color-canvas {
@@ -160,8 +169,9 @@ body {
 }
 
 .color-picker {
-  top: 0;
-  right: 0;
+  top: -12px;
+  right: -12px;
+  background-color: rgb(255, 0, 0);
 }
 
 .alpha-canvas {
@@ -171,8 +181,9 @@ body {
 }
 
 .alpha-picker {
-  bottom: 0;
+  bottom: -12px;
   left: calc(50% - 12px);
+  background-color: rgb(255, 0, 0);
 }
 
 input {
@@ -201,4 +212,14 @@ input {
 }
 
 .a-input {
+}
+
+.rgba-value {
+  position: absolute;
+  width: 100%;
+  color: #fff;
+  text-align: center;
+  font-size: 10pt;
+  bottom: 20px;
+  z-index: 20;
 }
