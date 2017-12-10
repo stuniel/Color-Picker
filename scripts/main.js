@@ -81,16 +81,16 @@ var panel = {
     for (var i = 0; i < imgdatalength / 4; i++) {
       var x = i % parent.width;
       var y = Math.floor(i / parent.width);
-      imgdata.data[4*i] = this.r
-      imgdata.data[4*i+1] = this.g
-      imgdata.data[4*i+2] = this.b
+      imgdata.data[4*i] = this.r;
+      imgdata.data[4*i+1] = this.g;
+      imgdata.data[4*i+2] = this.b;
       imgdata.data[4*i+3] = y/parent.height * 255;
     }
     ctx.putImageData(imgdata, 0, 0);
   },
   hueGradient: function (parent, x, y, hue) {
     var colorValue;
-    var segment = (parent.width/6)
+    var segment = (parent.width/6);
     var range = (x/parent.width)*6;
     var z = (x/segment);
     var perc = Math.floor(x % segment)/segment;
@@ -144,9 +144,9 @@ var panel = {
   updateRGBA: function (parent) {
     var x = Math.floor(this.elm.color.x);
     var y = Math.floor(this.elm.color.y);
-    this.r = Math.min(Math.floor((255-(255-this.hue[0])*(x/parent.width))*((parent.height-y)/parent.height)),255)
-    this.g = Math.min(Math.floor((255-(255-this.hue[1])*(x/parent.width))*((parent.height-y)/parent.height)),255)
-    this.b = Math.min(Math.floor((255-(255-this.hue[2])*(x/parent.width))*((parent.height-y)/parent.height)),255)
+    this.r = Math.min(Math.floor((255-(255-this.hue[0])*(x/parent.width))*((parent.height-y)/parent.height)),255);
+    this.g = Math.min(Math.floor((255-(255-this.hue[1])*(x/parent.width))*((parent.height-y)/parent.height)),255);
+    this.b = Math.min(Math.floor((255-(255-this.hue[2])*(x/parent.width))*((parent.height-y)/parent.height)),255);
     this.a = this.elm.alpha.y/this.elements.alphaCanvas.height;
   },
   updateHue: function (parent) {
@@ -155,9 +155,9 @@ var panel = {
     this.hue[2] = Math.floor(this.hueGradient(parent, this.elm.hue.x, this.elm.hue.y, 4));
   },
   updatePicker: function (type) {
-    if(type == "hue") {
+    if(type === "hue") {
       this.elm[type].picker.style.left = this.elm[type].x-(this.elm[type].pickerRect.width/2)+"px";
-    } else if(type == "alpha") {
+    } else if(type === "alpha") {
       this.elm[type].picker.style.top = this.elm[type].y-(this.elm[type].pickerRect.height/2)+"px";
     } else {
       this.elm[type].picker.style.left = this.elm[type].x-(this.elm[type].pickerRect.width/2)+"px";
@@ -165,7 +165,7 @@ var panel = {
     }
   },
   updatePickerCoords: function () {
-    this.elm.color.x = (this.xPer == 0 && this.yPer == 0) ? 0 :this.elements.colorCanvas.getBoundingClientRect().width * (1 - this.xPer);
+    this.elm.color.x = (this.xPer === 0 && this.yPer === 0) ? 0 :this.elements.colorCanvas.getBoundingClientRect().width * (1 - this.xPer);
     this.elm.color.y = this.elements.colorCanvas.getBoundingClientRect().height * (1 - this.yPer);
     this.elm.hue.x = this.elements.hueCanvas.getBoundingClientRect().width * (this.h/360);
     this.elm.alpha.y = this.elements.alphaCanvas.getBoundingClientRect().height * this.a;
@@ -175,8 +175,8 @@ var panel = {
     this.elements.rInput.value = this.r;
     this.elements.gInput.value = this.g;
     this.elements.bInput.value = this.b;
-    this.elements.aInput.value = (this.a).toFixed(2);
-    this.elements.rgbaValue.innerText = `rgba(${this.r}, ${this.g}, ${this.b}, ${(this.a).toFixed(2)})`;
+    this.elements.aInput.value = this.a;
+    this.elements.rgbaValue.innerText = `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`;
   },
   updateBackgroundColor: function () {
     this.elements.headerContainer.style.background = this.mixWhiteRgba(this.r, this.g, this.b, this.a);
@@ -195,62 +195,33 @@ var panel = {
     }
   },
   getHueAndCoords: function () {
-    var hue = this.hue;
     this.min = Math.min(this.r, this.g, this.b);
     this.max = Math.max(this.r, this.g, this.b);
     this.xPer = this.min/this.max;
     this.yPer = this.max/255;
-    if(this.r == this.g && this.g == this.b) {
-      this.hue[0] = 255;
+
+    function getHue(obj, color) {
+      return Math.floor(((obj.max*obj.xPer - color)/(obj.xPer - 1))/obj.yPer)
+    }
+
+    switch (this.max) {
+      case this.r:
+        (this.g === this.b) ? this.hue[1] = this.hue[2] = 0 : ((this.g > this.b) ? (this.hue[1] = getHue(this, this.g), this.hue[2] = 0) : (this.hue[2] = getHue(this, this.b), this.hue[1] = 0));
+        this.hue[0] = 255;
+        break;
+      case this.g:
+        (this.r === this.b) ? this.hue[0] = this.hue[2] = 0 : ((this.r > this.b) ? (this.hue[0] = getHue(this, this.r), this.hue[2] = 0) : (this.hue[2] = getHue(this, this.b), this.hue[0] = 0));
+        this.hue[1] = 255;
+        break;
+      case this.b:
+        (this.r === this.g) ? this.hue[0] = this.hue[1] = 0 : ((this.r > this.g) ? (this.hue[0] = getHue(this, this.r), this.hue[1] = 0) : (this.hue[1] = getHue(this, this.g), this.hue[0] = 0));
+        this.hue[2] = 255;
+        break;
+    }
+
+    if(this.max === this.min) {
       this.hue[1] = this.hue[2] = 0;
       this.xPer = 1;
-    } else if(this.r == this.g && this.b == this.min) {
-      this.hue[0] = this.hue[1] = 255;
-      this.hue[2] = Math.floor(((this.max*this.xPer - this.b)/(this.xPer - 1))/this.yPer);
-    } else if(this.r == this.b && this.g == this.min) {
-      this.hue[0] = this.hue[2] = 255;
-      this.hue[1] = Math.floor(((this.max*this.xPer - this.g)/(this.xPer - 1))/this.yPer);
-    } else if(this.g == this.b && this.r == this.min) {
-      this.hue[1] = this.hue[2] = 255;
-      this.hue[0] = Math.floor(((this.max*this.xPer - this.r)/(this.xPer - 1))/this.yPer);
-    } else {
-      switch(this.max) {
-        case this.r:
-          this.hue[0] = 255;
-          if(this.g == this.b) {
-            this.hue[1] = this.hue[2] = 0;
-          } else if(this.g == this.min) {
-            this.hue[1] = 0;
-            this.hue[2] = Math.floor(((this.max*this.xPer - this.b)/(this.xPer - 1))/this.yPer);
-          } else {
-            this.hue[1] = Math.floor(((this.max*this.xPer - this.g)/(this.xPer - 1))/this.yPer);
-            this.hue[2] = 0;
-          }
-          break;
-        case this.g:
-          this.hue[1] = 255;
-          if(this.r == this.b) {
-            this.hue[0] = this.hue[2] = 0;
-          } else if(this.r == this.min) {
-            this.hue[0] = 0;
-            this.hue[2] = Math.floor(((this.max*this.xPer - this.b)/(this.xPer - 1))/this.yPer);
-          } else {
-            this.hue[0] = Math.floor(((this.max*this.xPer - this.r)/(this.xPer - 1))/this.yPer);
-            this.hue[2] = 0;
-          }
-          break;
-        case this.b:
-          this.hue[2] = 255;
-          if(this.r == this.g) {
-            this.hue[0] = this.hue[1] = 0;
-          } else if(this.r == this.min) {
-            this.hue[0] = 0;
-            this.hue[1] = Math.floor(((this.max*this.xPer - this.g)/(this.xPer - 1))/this.yPer);
-          } else {
-            this.hue[0] = Math.floor(((this.max*this.xPer - this.r)/(this.xPer - 1))/this.yPer);
-            this.hue[1] = 0;
-          }
-      }
     }
   },
   hueToH: function () {
@@ -269,15 +240,17 @@ var panel = {
     this.h = h*360;
   },
   inputCheck: function (elm, n, color) {
-    if(elm.dataset.color == "r" || elm.dataset.color == "g" || elm.dataset.color == "b" || elm.dataset.color == "a") {
+    if(elm.dataset.color === "r" || elm.dataset.color === "g" || elm.dataset.color === "b" || elm.dataset.color === "a") {
+      n = Number(n)
       if(isNaN(n) || n<0 || n>255) {
         alert("Insert a valid number value!")
         return this[color]
       }
-      else if(color == "a" && n>0) return 1
+      else if(color === "a" && n>1) return 1
+      else if(color === "a") return n.toFixed(2)
       else return Math.floor(n)
-    } else if(elm.dataset.color == "hex") {
-      if(n.indexOf("#") !== 0) n = n.replace(/^/,'#');
+    } else if(elm.dataset.color === "hex") {
+      if(n.indexOf("#") !=== 0) n = n.replace(/^/,'#');
       if(/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(n)) return n;
       else return this.hex;
     }
@@ -292,6 +265,17 @@ var panel = {
    return "0123456789ABCDEF".charAt((n-n%16)/16)
         + "0123456789ABCDEF".charAt(n%16);
   },
+  hexToRgb: function(hex) {
+    var shorthandRegex = /^#?([a-f\d])([a-f\d])([a-f\d])$/i;
+    hex = hex.replace(shorthandRegex, function(m, r, g, b) {
+        return r + r + g + g + b + b;
+    });
+
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    panel.r = parseInt(result[1], 16);
+    panel.g = parseInt(result[2], 16);
+    panel.b = parseInt(result[3], 16);
+},
   mixWhiteRgba: function(r, g, b, a) {
     var base = [255, 255, 255, 1];
     var color = [r, g, b, a];
@@ -346,7 +330,7 @@ var panel = {
   elm.colorCanvas = panel.createColorCanvas();
   elm.colorPicker = panel.elm.color.picker = panel.createElm("div", elm.colorWrapper, "color-picker picker");
   panel.elm.color.pickerRect = panel.elm.color.picker.getBoundingClientRect();
-  elm.alphaCanvas = createAlphaCanvas();
+  elm.alphaCanvas = panel.createAlphaCanvas();
   elm.alphaPicker = panel.elm.alpha.picker = panel.createElm("div", elm.alphaWrapper, "alpha-picker picker");
   panel.elm.alpha.pickerRect = panel.elm.alpha.picker.getBoundingClientRect();
   elm.hexInput = panel.createElm("input", elm.hexWrapper, "hex-input");
@@ -366,9 +350,7 @@ var panel = {
   elm.rgbaValue = panel.createElm("p", elm.footerContainer, "rgba-value");
 })()
 
-//MOUSEDOWN APLHA WRAPPER
-
-window.addEventListener("resize", function() {
+function resize() {
   panel.getHueAndCoords();
   panel.updatePickerCoords();
   panel.updatePicker("hue");
@@ -383,23 +365,29 @@ window.addEventListener("resize", function() {
 
   panel.elements.colorCanvas.width = panel.elements.colorWrapper.getBoundingClientRect().width;
   panel.elements.colorCanvas.height = panel.elements.colorWrapper.getBoundingClientRect().height;
-  panel.drawColorCanvas(panel.elements.colorCanvas, panel.elements.colorCanvas)
+  panel.drawColorCanvas(panel.elements.colorCanvas, panel.elements.colorCanvas);
 
   panel.elements.alphaCanvas.width = panel.elements.alphaWrapper.getBoundingClientRect().width;
   panel.elements.alphaCanvas.height = panel.elements.alphaWrapper.getBoundingClientRect().height;
-  panel.drawAlphaCanvas(panel.elements.alphaCanvas, panel.elements.alphaCanvas)
+  panel.drawAlphaCanvas(panel.elements.alphaCanvas, panel.elements.alphaCanvas);
+}
+window.addEventListener("resize", function() {
+  panel.debounce(resize(), 50);
 },true)
 
 panel.elements.hueWrapper.addEventListener("mousedown", function(e) {
   panel.huePickerFlag = true;
   startHueUpdate(e, this);
+
   var hueMove = panel.debounce(function(event) {
     if(panel.huePickerFlag) {
       startHueUpdate(event, panel.elements.hueWrapper);
     }
   }, 1);
+
   document.addEventListener("mousemove", hueMove);
   document.addEventListener("mouseup", function() { panel.huePickerFlag = false });
+
   function startHueUpdate(e, elem) {
     panel.getMouse(e);
     panel.getElm(elem, "hue");
@@ -416,12 +404,15 @@ panel.elements.hueWrapper.addEventListener("mousedown", function(e) {
 panel.elements.colorWrapper.addEventListener("mousedown", function(e) {
   panel.colorPickerFlag = true;
   startColorUpdate(e, this);
+
   document.addEventListener("mousemove", function(event) {
     if(panel.colorPickerFlag) {
       startColorUpdate(event, panel.elements.colorWrapper);
     }
-  })
+  });
+
   document.addEventListener("mouseup", function() { panel.colorPickerFlag = false });
+
   function startColorUpdate(e, elem) {
     panel.getMouse(e);
     panel.getElm(elem, "color");
@@ -437,12 +428,15 @@ panel.elements.colorWrapper.addEventListener("mousedown", function(e) {
 panel.elements.alphaWrapper.addEventListener("mousedown", function(e) {
   panel.alphaPickerFlag = true;
   startAlphaUpdate(e, this);
+
   document.addEventListener("mousemove", function(event) {
     if(panel.alphaPickerFlag) {
       startAlphaUpdate(event, panel.elements.alphaWrapper);
     }
   });
+
   document.addEventListener("mouseup", function() { panel.alphaPickerFlag = false });
+
   function startAlphaUpdate(e, elm) {
     panel.getMouse(e);
     panel.getElm(elm, "alpha");
@@ -456,10 +450,12 @@ panel.elements.alphaWrapper.addEventListener("mousedown", function(e) {
 
 panel.elements.input.forEach(input => input.addEventListener("change", function(e) {
   input.value = panel.inputCheck(this, this.value, this.dataset.color);
-  if(this.dataset.color == "hex") {
-    hexToRgb(this.value);
+
+  if(this.dataset.color === "hex") {
+    panel.hexToRgb(this.value);
     panel[this.dataset.color] = input.value;
-  } else panel[this.dataset.color] = parseInt(input.value);
+  } else panel[this.dataset.color] = input.value;
+
   panel.updateInputValues();
   panel.getHueAndCoords();
   panel.hueToH();
@@ -470,7 +466,7 @@ panel.elements.input.forEach(input => input.addEventListener("change", function(
   panel.drawColorCanvas(panel.elements.colorCanvas, panel.elements.colorCanvas);
   panel.drawAlphaCanvas(panel.elements.alphaCanvas, panel.elements.alphaCanvas);
   panel.updateBackgroundColor();
-  panel.textColorCheck()
+  panel.textColorCheck();
 }))
 
 panel.getHueAndCoords();
