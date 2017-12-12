@@ -250,7 +250,7 @@ var panel = {
       else if(color === "a") return n.toFixed(2)
       else return Math.floor(n)
     } else if(elm.dataset.color === "hex") {
-      if(n.indexOf("#") !=== 0) n = n.replace(/^/,'#');
+      if(n.indexOf("#") !== 0) n = n.replace(/^/,'#');
       if(/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(n)) return n;
       else return this.hex;
     }
