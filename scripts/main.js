@@ -147,7 +147,7 @@ var panel = {
     this.r = Math.min(Math.floor((255-(255-this.hue[0])*(x/parent.width))*((parent.height-y)/parent.height)),255);
     this.g = Math.min(Math.floor((255-(255-this.hue[1])*(x/parent.width))*((parent.height-y)/parent.height)),255);
     this.b = Math.min(Math.floor((255-(255-this.hue[2])*(x/parent.width))*((parent.height-y)/parent.height)),255);
-    this.a = this.elm.alpha.y/this.elements.alphaCanvas.height;
+    this.a = (this.elm.alpha.y/this.elements.alphaCanvas.height).toFixed(2);
   },
   updateHue: function (parent) {
     this.hue[0] = Math.floor(this.hueGradient(parent, this.elm.hue.x, this.elm.hue.y, 0));
@@ -250,7 +250,7 @@ var panel = {
       else if(color === "a") return n.toFixed(2)
       else return Math.floor(n)
     } else if(elm.dataset.color === "hex") {
-      if(n.indexOf("#") !=== 0) n = n.replace(/^/,'#');
+      if(n.indexOf("#") !== 0) n = n.replace(/^/,'#');
       if(/(^#[0-9A-F]{6}$)|(^#[0-9A-F]{3}$)/i.test(n)) return n;
       else return this.hex;
     }
