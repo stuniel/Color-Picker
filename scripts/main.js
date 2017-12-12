@@ -175,8 +175,8 @@ var panel = {
     this.elements.rInput.value = this.r;
     this.elements.gInput.value = this.g;
     this.elements.bInput.value = this.b;
-    this.elements.aInput.value = this.a;
-    this.elements.rgbaValue.innerText = `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a})`;
+    this.elements.aInput.value = this.a.toFixed(2);
+    this.elements.rgbaValue.innerText = `rgba(${this.r}, ${this.g}, ${this.b}, ${this.a.toFixed(2)})`;
   },
   updateBackgroundColor: function () {
     this.elements.headerContainer.style.background = this.mixWhiteRgba(this.r, this.g, this.b, this.a);
